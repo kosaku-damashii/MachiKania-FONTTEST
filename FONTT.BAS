@@ -40,7 +40,7 @@ WHILE 1
     ELSEIF A=$08 THEN
       SEL_X=SEL_X-CHRW
       IF SEL_X < 0 THEN SEL_X=0
-      BOXFILL SEL_X,0,SEL_X+CHRW,CHRH,0
+      BOXFILL SEL_X,0,SEL_X+CHRW-1,CHRH-1,0
     ELSEIF A=$0D THEN
       POINT SEL_X,0
       C$=CHR$(KU)+CHR$($A1+((MAXW/CHRW)-1)*(CSR_Y-(SYSTEM(21)-AREAH*2)-1)/2+CSR_X/2)+CHR$($00)
@@ -59,23 +59,17 @@ WHILE 1
         CODE=$A1A1
         KU=(CODE >> 8) AND $FF
         CSR_Y=SYSTEM(21)-AREAH*2+1
-      ELSEIF CODE < $A9A1 THEN
-        GOSUB PRTCHR,KU
-        CSR_Y=SYSTEM(21)-1
-      ELSEIF CODE < $B0A1 THEN
-        CODE=$A8A1
-        KU=(CODE >> 8) AND $FF
-        GOSUB PRTCHR,KU
-        CSR_Y=SYSTEM(21)-1
-      ELSEIF CODE < $F5A1 THEN
-        GOSUB PRTCHR,KU
-        CSR_Y=SYSTEM(21)-1
-      ELSEIF CODE < $F9A1 THEN
-        CODE=$A4A1
-        KU=(CODE >> 8) AND $FF
-        GOSUB PRTCHR,KU
-        CSR_Y=SYSTEM(21)-1
       ELSE
+        IF CODE < $A9A1 THEN
+        ELSEIF CODE < $B0A1 THEN
+          CODE=$A8A1
+          KU=(CODE >> 8) AND $FF
+        ELSEIF CODE < $F5A1 THEN
+        ELSEIF CODE < $F9A1 THEN
+          CODE=$A4A1
+          KU=(CODE >> 8) AND $FF
+        ELSE
+        ENDIF
         GOSUB PRTCHR,KU
         CSR_Y=SYSTEM(21)-1
       ENDIF
@@ -86,25 +80,19 @@ WHILE 1
         CODE=$FEA1
         KU=(CODE >> 8) AND $FF
         CSR_Y=SYSTEM(21)-1
-      ELSEIF CODE < $A9A1 THEN
-        GOSUB PRTCHR,KU
-        CSR_Y=SYSTEM(21)-AREAH*2+1
-      ELSEIF CODE < $B0A1 THEN
-        CODE=$B0A1
-        KU=(CODE >> 8) AND $FF
-        GOSUB PRTCHR,KU
-        CSR_Y=SYSTEM(21)-AREAH*2+1
-      ELSEIF CODE < $F5A1 THEN
-        GOSUB PRTCHR,KU
-        CSR_Y=SYSTEM(21)-1
-      ELSEIF CODE < $F9A1 THEN
-        CODE=$F9A1
-        KU=(CODE >> 8) AND $FF
-        GOSUB PRTCHR,KU
-        CSR_Y=SYSTEM(21)-1
       ELSE
+        IF CODE < $A9A1 THEN
+        ELSEIF CODE < $B0A1 THEN
+          CODE=$B0A1
+          KU=(CODE >> 8) AND $FF
+        ELSEIF CODE < $F5A1 THEN
+        ELSEIF CODE < $F9A1 THEN
+          CODE=$F9A1
+          KU=(CODE >> 8) AND $FF
+        ELSE
+        ENDIF
         GOSUB PRTCHR,KU
-        CSR_Y=SYSTEM(21)-AREAH*2+1
+         CSR_Y=SYSTEM(21)-AREAH*2+1
       ENDIF
     ENDIF
 
@@ -132,4 +120,5 @@ DO WHILE A < $FE
   X=0
   Y=Y+CHRH 
 LOOP
+WHILE READKEY()!=0:WEND
 RETURN
