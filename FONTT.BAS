@@ -13,10 +13,10 @@ Y=MAXH-1-CHRH*AREAH
 SEL_X=0
 CSR_X=0
 CSR_Y=SYSTEM(21)-AREAH*2+1 
-DIM KANA($5A-$30+1)
+DIM KANA((($5A-$30+1)+($BF-$BA+1)+2+1)+1)
 
 RESTORE KANA_T
-FOR I=0 TO ($5A-$30)
+FOR I=0 TO (($5A-$30+1)+($BF-$BA)+1)+2+1-1
   KANA(I)=READ()
 NEXT
 
@@ -30,18 +30,38 @@ PRINT CHR$($82)+CHR$($82)
 WHILE 1
   S=READKEY()
   IF S THEN
+    A=(S >> 8) AND $FF
+    CURSOR CSR_X,CSR_Y
+    PRINT "  "
+
     IF (S AND $040000) != 0 THEN
       A=(S >> 8) AND $FF
       IF ((A >= $30) AND (A <= $5A)) THEN
         CODE=KANA(A-$30) 
         KU=(CODE >> 8) AND $FF
         GOSUB PRTCHR,KU
+        CSR_X=(((CODE AND $FF)-$A1) % (MAXW/CHRW-1))*2 
+        CSR_Y=(((CODE AND $FF)-$A1) / (MAXW/CHRW-1))*2+SYSTEM(21)-AREAH*2+1
+      ELSEIF ((A >= $BA) AND (A <= $BF)) THEN
+        CODE=KANA(A-$BA+($5A-$30+1)) 
+        KU=(CODE >> 8) AND $FF
+        GOSUB PRTCHR,KU
+        CSR_X=(((CODE AND $FF)-$A1) % (MAXW/CHRW-1))*2 
+        CSR_Y=(((CODE AND $FF)-$A1) / (MAXW/CHRW-1))*2+SYSTEM(21)-AREAH*2+1
+      ELSEIF ((A >= $DD) AND (A <= $DE)) THEN
+        CODE=KANA(A-$DD+($5A-$30+1)+($BF-$BA+1)) 
+        KU=(CODE >> 8) AND $FF
+        GOSUB PRTCHR,KU
+        CSR_X=(((CODE AND $FF)-$A1) % (MAXW/CHRW-1))*2 
+        CSR_Y=(((CODE AND $FF)-$A1) / (MAXW/CHRW-1))*2+SYSTEM(21)-AREAH*2+1
+      ELSEIF A = $E2 THEN
+        CODE=KANA(($5A-$30+1)+($BF-$BA+1)+2) 
+        KU=(CODE >> 8) AND $FF
+        GOSUB PRTCHR,KU
+        CSR_X=(((CODE AND $FF)-$A1) % (MAXW/CHRW-1))*2 
+        CSR_Y=(((CODE AND $FF)-$A1) / (MAXW/CHRW-1))*2+SYSTEM(21)-AREAH*2+1
       ENDIF
     ELSE
-      A=(S >> 8) AND $FF
-      CURSOR CSR_X,CSR_Y
-      PRINT "  "
-
       IF ((A>=$70) AND (A<=$77)) THEN
         CODE=$A1A1+(A-$70)*$100
         KU=(CODE >> 8) AND $FF
@@ -150,10 +170,13 @@ WHILE READKEY()!=0:WEND
 RETURN
 
 LABEL KANA_T
-DATA $CFC1,$C7AD,$CAA1,$B0A1,$B1A6,$B1C1,$B2A1,$CDA1,$CDA1,$CDB5,
+DATA $CFC1,$C7AD,$CAA1,$B0A1,$B1A6,$B1C1,$B2A1,$CDA1,$CDA1,$CDBD,
      $A1A1,$A1A1,$A1A1,$A1A1,$A1A1,$A1A1,$A1A1,
      $C4A1,$B8C3,$C0A4,$BCC5,$B1A1,$C7C5,$B5A1,
      $B7A1,$C7A1,$CCA1,$C7B5,$CEA1,$CDA1,$CCA3,
      $CEA1,$C0A4,$C2BE,$C0A3,$C5A1,$B2BC,$C7A1,
-     $C9A1,$C5A1,$BAB3,$D0A1,$C4C5
+     $C9A1,$C5A1,$BAB3,$D0A1,$C4C5,
+     $B7B5,$CFA1,$C7AD,$CBA1,$CFA1,$CCBD,
+     $CCB5,$CABA,
+     $CFA4
 
