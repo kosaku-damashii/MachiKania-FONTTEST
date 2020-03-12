@@ -12,7 +12,7 @@ CODE=SLCT
 X=0
 Y=MAXH-1-CHRH
 
-FOR I=0 TO (MAXW/CHRW)-1
+FOR I=0 TO (MAXW/CHRW)-2
   K=NEW(CKNJ16,"EUC-JP")
   POINT X+CHRW*I,Y
   C$=CHR$(((CODE+I)>>8) AND $FF)+CHR$((CODE+I) AND $FF)+CHR$($00)
@@ -40,22 +40,33 @@ WHILE 1
 
     IF CSR_X < 0 THEN
       IF CODE < $A1A1 THEN
-        CODE=$A1A1 
+        CODE=$A1A1
         CSR_X=0
      ELSE
+       BOXFILL 0,MAXH-1-CHRH,MAXW-1,MAXH-1,0
        CODE=CODE-$100
-       FOR I=0 TO (MAXW/CHRW)-1
+       FOR I=0 TO (MAXW/CHRW)-2
          POINT X+CHRW*I,Y
          C$=CHR$(((CODE+I)>>8) AND $FF)+CHR$((CODE+I) AND $FF)+CHR$($00)
-REM         BOXFILL 0,MAXH-1-CHRH,MAXW-1,MAXH-1,0 
          K.GPRT(C$,7,0)
        NEXT
        CSR_X=SYSTEM(20)-4
-
      ENDIF
-
     ELSEIF CSR_X >= SYSTEM(20)-2 THEN
-      CSR_X=SYSTEM(20)-4
+
+      IF CODE > $FEA1 THEN
+        CODE=$FEA1
+        CSR_X=SYSTEM(20)-4
+     ELSE
+       BOXFILL 0,MAXH-1-CHRH,MAXW-1,MAXH-1,0
+       CODE=CODE+$100
+       FOR I=0 TO (MAXW/CHRW)-2
+         POINT X+CHRW*I,Y
+         C$=CHR$(((CODE+I)>>8) AND $FF)+CHR$((CODE+I) AND $FF)+CHR$($00)
+         K.GPRT(C$,7,0)
+       NEXT
+       CSR_X=0
+     ENDIF
     ELSEIF CSR_Y < 0 THEN
       CSR_Y=0
     ELSEIF CSR_Y >= SYSTEM(21) THEN
